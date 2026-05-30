@@ -1,6 +1,6 @@
-name: Project CI Pipeline
+name: Python Project CI
 
-# 1. TRIGGER: Run this every time someone pushes code to the main branch
+# Trigger the workflow on every push or pull request to the main branch
 on:
   push:
     branches: [ main ]
@@ -8,26 +8,28 @@ on:
     branches: [ main ]
 
 jobs:
-  # 2. RUNNER: The virtual computer that will run our tests
-  test-project:
+  build-and-test:
     runs-on: ubuntu-latest
 
-    # 3. STEPS: The actual commands to run
     steps:
-      # Step 1: Copy your uploaded repository code onto the virtual computer
+      # 1. Download your repository files onto the GitHub runner
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      # Step 2: Install Node.js on the virtual computer
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # 2. Set up the Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-node-version: '20'
+          python-version: '3.10' # You can change this to 3.9, 3.11, etc.
 
-      # Step 3: Install your project's dependencies
+      # 3. Upgrade pip and install requirements if you have a requirements.txt file
       - name: Install dependencies
-        run: npm install
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # Step 4: Run your code tests
-      - name: Run automated tests
-        run: npm test
+      # 4. Run your main python file to make sure it has no syntax errors
+      - name: Run Python Script
+        run: |
+          python main.py
+
